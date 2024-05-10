@@ -41,7 +41,7 @@ class WebViewWindow:
             x, y = monitors[0].x, monitors[0].y
 
         # Configurar la ventana para abarcar todas las pantallas desde la posición de la pantalla principal
-        self.window = webview.create_window("WebView Window", width=total_width, height=total_height, url=self.current_url, frameless=True, fullscreen=False, x=x, y=y)
+        self.window = webview.create_window("WebView Window", width=total_width, height=total_height, url=self.current_url, frameless=True, x=x, y=y)
 
         # Iniciar el servidor socket en un hilo
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
