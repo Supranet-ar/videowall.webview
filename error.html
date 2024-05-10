@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error de conexión</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(rgb(204, 229, 255, 1), rgba(204, 229, 255, 0.3)), #f2f2f2;
+        }
+
+        .content {
+            text-align: left;
+            margin-right: 20px;
+        }
+
+        h1 {
+            color: #FF0000; /* Rojo para resaltar el título */
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #333333; /* Color de texto oscuro */
+            margin: 0;
+        }
+
+        .image-container {
+            max-width: 60%; /* Máximo ancho para evitar que la imagen sea demasiado grande */
+        }
+
+        .image-container img {
+            width: 100%; /* La imagen ocupa el 100% del ancho del contenedor */
+            height: auto; /* Altura automática para mantener la relación de aspecto */
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="image-container">
+            <img src="recursos/waiting.png" alt="Imagen de conexión">
+        </div>
+    </div>
+    <div class="content">
+        <h1>Esperando conexión</h1>
+        <p>No se pudo cargar la página debido a la falta de conexión a Internet.</p>
+    </div>
+</body>
+</html>
