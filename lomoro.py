@@ -83,7 +83,7 @@ class WebViewWindow:
                     self.current_url = data  # Actualizar la URL actual
                     self.refresh_webview()
 
-                client_socket.close()
+                #client_socket.close()
             except OSError:
                 break  # Salir del bucle si se produce un error de socket
 
