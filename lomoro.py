@@ -7,11 +7,13 @@ import psutil
 import webview
 from screeninfo import get_monitors
 import netifaces as ni
+import keyboard
 
 class WebViewWindow:
     def __init__(self):
         self.keep_running = True
-        self.current_url = "http://supranet.ar/carteleria/lomoro-x4/"
+        self.current_url_index = 0
+        self.urls = self.load_urls_from_file("urls.txt")
         self.error_url = f"file://{os.path.join(os.path.dirname(__file__), 'error.html')}"
 
         # Obtener la dirección IP del dispositivo
@@ -33,7 +35,7 @@ class WebViewWindow:
             x, y = monitors[0].x, monitors[0].y
 
         # Configurar la ventana para abarcar todas las pantallas desde la posición de la pantalla principal
-        self.window = webview.create_window("WebView Window", width=total_width, height=total_height, url=self.current_url, frameless=True, easy_drag=False, x=x, y=y)
+        self.window = webview.create_window("WebView Window", width=total_width, height=total_height, url=self.urls[self.current_url_index], frameless=True, easy_drag=False, x=x, y=y)
 
         # Iniciar el servidor socket en un hilo
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,6 +51,20 @@ class WebViewWindow:
         # Iniciar la detección de cambios de conectividad de red en un hilo separado
         self.network_thread = threading.Thread(target=self.monitor_network_changes, daemon=True)
         self.network_thread.start()
+
+        # Registrar el evento del teclado
+        keyboard.on_press_key("r", self.change_url)
+
+    def load_urls_from_file(self, filename):
+        if not os.path.exists(filename):
+            # Si el archivo no existe, crearlo con la URL predeterminada
+            with open(filename, "w") as file:
+                file.write("http://supranet.ar/carteleria/lomoro-x4/\n")
+            return ["http://supranet.ar/carteleria/lomoro-x4/"]
+        else:
+            with open(filename, "r") as file:
+                urls = file.read().splitlines()
+            return urls
 
     def get_local_ip(self):
         interfaces = ni.interfaces()
@@ -70,7 +86,8 @@ class WebViewWindow:
                     self.window.destroy()
                     self.keep_running = False  # Establecer keep_running en False para detener otros bucles
                 elif data:  # Verificar si se recibe una URL
-                    self.current_url = data  # Actualizar la URL actual
+                    self.current_url_index = 0  # Restablecer el índice de URL al recibir una nueva URL
+                    self.urls = [data]  # Reemplazar la lista de URLs con la nueva URL
                     self.refresh_webview()
 
                 #client_socket.close()
@@ -80,7 +97,7 @@ class WebViewWindow:
     def refresh_webview(self):
         try:
             if self.check_internet_connection():
-                self.window.load_url(self.current_url)
+                self.window.load_url(self.urls[self.current_url_index])
             else:
                 self.window.load_url(self.error_url)
         except Exception as e:
@@ -112,6 +129,10 @@ class WebViewWindow:
             return True
         except:
             return False
+
+    def change_url(self, event):
+        self.current_url_index = (self.current_url_index + 1) % len(self.urls)
+        self.refresh_webview()
 
     def stop_threads(self):
         self.keep_running = False
