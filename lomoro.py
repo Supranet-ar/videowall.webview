@@ -5,7 +5,6 @@ import threading
 import time
 import psutil
 import webview
-import logging
 from screeninfo import get_monitors
 import netifaces as ni
 
@@ -14,13 +13,6 @@ class WebViewWindow:
         self.keep_running = True
         self.current_url = "http://supranet.ar/carteleria/lomoro-x4/"
         self.error_url = f"file://{os.path.join(os.path.dirname(__file__), 'error.html')}"
-
-        # Limpiar el archivo de registro cada vez que se inicia el programa
-        with open('webview_errors.log', 'w'):
-            pass
-
-        # Configurar el formato del registro de errores
-        logging.basicConfig(filename='webview_errors.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
         # Obtener la dirección IP del dispositivo
         ip = self.get_local_ip()
@@ -75,11 +67,9 @@ class WebViewWindow:
                 data = client_socket.recv(1024).decode('utf-8').strip()
 
                 if data == "exit":
-                    logging.info("Instrucción de cierre recibida. Cerrando el socket y la ventana.")
                     self.window.destroy()
                     self.keep_running = False  # Establecer keep_running en False para detener otros bucles
                 elif data:  # Verificar si se recibe una URL
-                    logging.info(f"Recibida URL: {data}")
                     self.current_url = data  # Actualizar la URL actual
                     self.refresh_webview()
 
@@ -94,8 +84,7 @@ class WebViewWindow:
             else:
                 self.window.load_url(self.error_url)
         except Exception as e:
-            # Registrar el error en el archivo de registro
-            logging.error(f"Error al refrescar el WebView: {e}", exc_info=True)
+            pass
 
         # Cancelar el temporizador existente antes de iniciar uno nuevo
         if self.refresh_timer.is_alive():
@@ -112,7 +101,6 @@ class WebViewWindow:
             current_status = psutil.net_if_stats()
             # Verificar si hay algún cambio en el estado de la red
             if current_status != initial_status:
-                logging.info("Se detectó un cambio en la conectividad de red")
                 # Ejecutar el método refresh_webview() en respuesta al cambio de conectividad
                 self.refresh_webview()
                 initial_status = current_status  # Actualizar el estado inicial de la red
@@ -136,9 +124,6 @@ if __name__ == '__main__':
     window = WebViewWindow()
     try:
         webview.start()
-    except Exception as e:
-        # Registrar el error en el archivo de registro
-        logging.error(f"Se produjo un error: {e}", exc_info=True)
     finally:
         window.stop_threads()
         sys.exit(1)  # Salir del programa con un código de error
